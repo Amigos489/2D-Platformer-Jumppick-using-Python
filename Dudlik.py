@@ -10,10 +10,9 @@ BLACK = (0, 0, 0)
 
 
 FPS = 30
-running = True
 size = (297, 596)
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption("Dudlik")
+pygame.display.set_caption("Only Jump")
 clock = pygame.time.Clock()
 is_GameOver = False
 
@@ -32,15 +31,12 @@ Platform_rect_list = [] #Список для хранения Rect платфо�
 #Coordinate_Platform_rect_list = [] #Список хранящий координаты плтаформ
 bg_y = 0
 
-#Функция (пока затычка), реализация главного меню
-def main_menu():
-    return
 
 #Функция для генерации платформ
 def Generation_platform(Platform_cnt):
     for i in range(Platform_cnt):
         x = random.randint(0, 300)
-        y = random.randint(-30, -20)
+        y = random.randint(-25, -10)
         Platform_rect_list.append(pygame.Surface((60, 5)).get_rect(center = (x, y)))
 
 
@@ -55,6 +51,8 @@ Platform1_x = 200
 
 
 #изображения
+name_game = pygame.image.load("img/Name_Game.jpg").convert()
+name_game.set_colorkey("Black")
 background = pygame.image.load("img/background.png").convert() #задний фон
 background1 = pygame.image.load("img/background.png").convert() #задний фон для движения
 PlatformImage = pygame.image.load("img/Platform.png")
@@ -72,6 +70,85 @@ jump_height = 14
 direction = True
 
 i = 0
+
+
+
+
+
+is_exit = False
+#Функция (пока затычка), реализация главного меню
+def main_menu():
+    button_play = (pygame.image.load("img/Button_Play.png"))
+    button_play.set_colorkey("Red")
+    button_play_rect = button_play.get_rect(topleft = (42, 350))
+
+    button_exit = (pygame.image.load("img/Button_Exit.png"))
+    button_exit.set_colorkey("Red")
+    button_exit_rect = button_exit.get_rect(topleft = (42, 420))
+
+    button_play_click = (pygame.image.load("img/Button_Play_Click.png"))
+    button_play_click.set_colorkey("Red")
+
+    button_exit_click = (pygame.image.load("img/Button_Exit_Click.png"))
+    button_exit_click.set_colorkey("Red")
+
+    global is_exit
+
+    running1 = True
+    main_menu_bg_y = 0
+    while running1:
+
+        screen.blit(background, (0, main_menu_bg_y))
+        screen.blit(background, (0, main_menu_bg_y - 596))
+        screen.blit(name_game, (-22, 70))
+
+        screen.blit(button_play, (42, 350))
+        screen.blit(button_exit, (42, 420))
+
+        print(pygame.mouse.get_pos())
+        if button_play_rect.collidepoint(pygame.mouse.get_pos()):
+            screen.blit(button_play_click, (42, 350))
+        elif button_exit_rect.collidepoint(pygame.mouse.get_pos()):
+            screen.blit(button_exit_click, (42, 420))
+
+
+        if main_menu_bg_y == 596:
+            main_menu_bg_y = 0
+        else:
+            main_menu_bg_y += 2
+
+
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running1 = False
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_cord = event.pos
+                #print(mouse_cord)
+                if button_play_rect.collidepoint(mouse_cord):
+                    print("нажатие по кнопке play")
+                    return
+                elif button_exit_rect.collidepoint(mouse_cord):
+                    print("нажатие по кнопке exit")
+                    running1 = False
+                    is_exit = True
+
+
+
+        clock.tick(FPS)
+        pygame.display.update()
+    return
+
+
+
+running = True
+main_menu()
+
+if is_exit == True:
+    print(1)
+    running = False
 
 while running:
     #обновление игры
