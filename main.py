@@ -4,22 +4,21 @@ import random
 
 pygame.init()
 
-
 #Глобальные переменные для всех функций
 FPS = 30
 size = (297, 596)
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption("Only Jump")
+pygame.display.set_caption("Jumppick")
 clock = pygame.time.Clock()
-is_GameOver = False
+schore_counter = 0
 
-#нажат крестик
-is_exit = False
-
-#Создание таймера
+#Создание таймера для генерации платформ
 Platform_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(Platform_timer, 1500) #1,5 сек
+pygame.time.set_timer(Platform_timer, 1500) # 1,5 сек
 
+#Создание таймера для начисления очков
+Schore_timer = pygame.USEREVENT + 1
+pygame.time.set_timer(Schore_timer, 1500)
 
 Platform_rect_list = [] #Список для хранения Rect платформ
 Platform_rect_list_image = [] #Список хранящий координаты изображений платформ
@@ -27,41 +26,29 @@ Platform_rect_list_image = [] #Список хранящий координат�
 #Функция для генерации платформ, проверяющая что платформы не соприкосаются
 def Generation_platform(Platform_cnt):
     for i in range(1, Platform_cnt):
-        x = random.randint(0, 297 - 60)
-        y = random.randint(-60, 0)
+        x = random.randint(0, 267)
+        y = random.randint(-120, -100)
+        #print(f"y = {y}")
         el = pygame.Surface((60, 20)).get_rect(topleft=(x, y))
         if len(Platform_rect_list_image) > 0:
             if el.collidelist(Platform_rect_list_image) == -1:
-                print("Успешно!")
+                #print("Успешно!")
                 Platform_rect_list.append(pygame.Surface((60, 5)).get_rect(topleft=(x, y)))
-                Platform_rect_list_image.append(pygame.Surface((70, 30)).get_rect(topleft=(x, y)))
-            else:
-                print("Ошибка!")
-                print("Перемекается с ", el.collidelist(Platform_rect_list_image))
+                Platform_rect_list_image.append(pygame.Surface((70, 40)).get_rect(topleft=(x, y)))
+            #else:
+                #print("Ошибка!")
+                #print("Перемекается с ", el.collidelist(Platform_rect_list_image))
         else:
-            print("Добавили первый элемент в генерации")
+            #print("Добавили первый элемент в генерации")
             Platform_rect_list.append(pygame.Surface((60, 5)).get_rect(topleft=(x, y)))
-            Platform_rect_list_image.append(pygame.Surface((70, 30)).get_rect(topleft=(x, y)))
-
-
-#Пока костыль первые 2 платформы зараненее на экране
-#платформа
-Platform = pygame.Surface((60, 20))
-Platform_y = 110
-Platform_x = 0
-
-Platform1 = pygame.Surface((60, 20))
-Platform1_y = 140
-Platform1_x = 200
-
+            Platform_rect_list_image.append(pygame.Surface((70, 40)).get_rect(topleft=(x, y)))
 
 #изображения
-name_game = pygame.image.load("img/Name_Game1.png").convert()
-name_game.set_colorkey("Red")
+name_game = pygame.image.load("img/Name_Game.png").convert()
+name_game.set_colorkey("White")
 background = pygame.image.load("img/background.png").convert() #задний фон
 background1 = pygame.image.load("img/background.png").convert() #задний фон для движения
-PlatformImage = pygame.image.load("img/Platform.png")
-
+PlatformImage = pygame.image.load("img/Platform.png").convert() #Изображение платформы
 
 #игрок
 player = [pygame.image.load("img/player/player_right.png").convert(), pygame.image.load("img/player/player_left.png").convert()]
@@ -76,25 +63,25 @@ direction = True
 i = 0
 is_exit = False
 
-
-
 #Функция, реализация главного меню
 def main_menu():
+    button_click = pygame.mixer.Sound("Sound/button_click.wav")
+
     global is_exit
 
     #Подгрузка изображений
-    button_play = (pygame.image.load("img/Button_Play.png"))
+    button_play = (pygame.image.load("img/Button_Play.png")).convert()
     button_play.set_colorkey("Red")
     button_play_rect = button_play.get_rect(topleft = (42, 350))
 
-    button_exit = (pygame.image.load("img/Button_Exit.png"))
+    button_exit = (pygame.image.load("img/Button_Exit.png")).convert()
     button_exit.set_colorkey("Red")
     button_exit_rect = button_exit.get_rect(topleft = (42, 420))
 
-    button_play_click = (pygame.image.load("img/Button_Play_Click.png"))
+    button_play_click = (pygame.image.load("img/Button_Play_Click.png")).convert()
     button_play_click.set_colorkey("Red")
 
-    button_exit_click = (pygame.image.load("img/Button_Exit_Click.png"))
+    button_exit_click = (pygame.image.load("img/Button_Exit_Click.png")).convert()
     button_exit_click.set_colorkey("Red")
 
     running1 = True
@@ -103,12 +90,12 @@ def main_menu():
 
         screen.blit(background, (0, main_menu_bg_y))
         screen.blit(background, (0, main_menu_bg_y - 596))
-        screen.blit(name_game, (2, 70))
+        screen.blit(name_game, (15, 70))
 
         screen.blit(button_play, (42, 350))
         screen.blit(button_exit, (42, 420))
 
-        print(pygame.mouse.get_pos())
+        #print(pygame.mouse.get_pos())
         if button_play_rect.collidepoint(pygame.mouse.get_pos()):
             screen.blit(button_play_click, (42, 350))
         elif button_exit_rect.collidepoint(pygame.mouse.get_pos()):
@@ -128,12 +115,13 @@ def main_menu():
                 mouse_cord = event.pos
                 #print(mouse_cord)
                 if button_play_rect.collidepoint(mouse_cord):
-                    print("нажатие по кнопке play")
+                    #print("нажатие по кнопке play")
+                    button_click.play()
                     Gameplay()
                     #вызываю функцию начала игры
                     return
                 elif button_exit_rect.collidepoint(mouse_cord):
-                    print("нажатие по кнопке exit")
+                    #print("нажатие по кнопке exit")
                     running1 = False
                     sys.exit()
 
@@ -141,9 +129,18 @@ def main_menu():
         pygame.display.update()
     return
 
-
 #Функция игрового процесса
 def Gameplay():
+    global schore_counter
+    schore_counter = 0
+    font_current_schore = pygame.font.Font(None, 40)
+
+    sound_jump = pygame.mixer.Sound("Sound/jump_sound.wav")
+
+    schore = pygame.image.load("img/image_schore.png").convert()
+    schore.set_colorkey("White")
+
+
 
     # переменная для движения заднего фона
     bg_y = 0
@@ -151,22 +148,20 @@ def Gameplay():
     Platform_rect_list.clear()
     Platform_rect_list_image.clear()
 
-    # изображения
-    name_game = pygame.image.load("img/Name_Game1.png").convert()
-    name_game.set_colorkey("Red")
-    background = pygame.image.load("img/background.png").convert()  # задний фон
-    background1 = pygame.image.load("img/background.png").convert()  # задний фон для движения
-    PlatformImage = pygame.image.load("img/Platform.png")
-
     # Пока костыль первые 2 платформы зараненее на экране
     # платформа
     Platform = pygame.Surface((60, 20))
-    Platform_y = 110
-    Platform_x = 0
+    Platform_y = 70
+    Platform_x = 149
 
     Platform1 = pygame.Surface((60, 20))
-    Platform1_y = 140
-    Platform1_x = 200
+    Platform1_y = -20
+    Platform1_x = 240
+
+    Platform2 = pygame.Surface((60, 20))
+    Platform2_y = -50
+    Platform2_x = 20
+
 
 
     # Данные игрока
@@ -174,8 +169,8 @@ def Gameplay():
               pygame.image.load("img/player/player_left.png").convert()]
     for i in range(2):
         player[i].set_colorkey((255, 255, 255))
-    player_x = 200
-    player_y = 60
+    player_x = 149
+    player_y = 20
     player_speed = 7
     is_jump = False
     jump_height = 14
@@ -187,6 +182,11 @@ def Gameplay():
         # обновление игры
         screen.blit(background, (0, bg_y))
         screen.blit(background, (0, bg_y - 596))
+
+        text_num_schore = font_current_schore.render(f"{schore_counter}", True, (107, 107, 107))
+        screen.blit(schore, (-3, 555))
+        screen.blit(text_num_schore, (113, 565))
+
         if direction:
             screen.blit(player[0], (player_x, player_y - 83))
             # screen.blit(pygame.Surface((60, 5)), (player_x, player_y))
@@ -197,15 +197,16 @@ def Gameplay():
             player_rect = pygame.Surface((60, 5)).get_rect(topleft=(player_x, player_y))
         screen.blit(PlatformImage, (Platform_x, Platform_y))
         screen.blit(PlatformImage, (Platform1_x, Platform1_y))
+        screen.blit(PlatformImage, (Platform2_x, Platform2_y))
 
         if Platform_rect_list:
             for el in Platform_rect_list:
                 # screen.blit(pygame.Surface((60, 5)), el)
                 screen.blit(PlatformImage, (el.x, el[1]))
-                screen.blit(pygame.Surface((60, 20)), el)
-                if el.y >= 596 + 150:
+                #screen.blit(pygame.Surface((60, 20)), el)
+                if el.y >= 596 + 350:
                     Platform_rect_list.remove(el)
-                    print(f"Платформа {i} больше не нужна {el},)")
+                    #print(f"Платформа {i} больше не нужна {el},)")
                     i += 1
                 else:
                     el.y += 3
@@ -214,52 +215,55 @@ def Gameplay():
         if Platform_rect_list_image:
             for el in Platform_rect_list_image:
                 # screen.blit(pygame.Surface((60, 5)), el)
-                screen.blit(PlatformImage, (el.x, el[1]))
+                screen.blit(PlatformImage, (el.x, el.y))
                 # screen.blit(pygame.Surface((60, 20)), el)
-                if el.y >= 596 + 150:
+                if el.y >= 596 + 350:
                     Platform_rect_list_image.remove(el)
-                    print(f"Платформа {i} больше не нужна {el},)")
+                    #print(f"Платформа {i} больше не нужна {el},)")
                     i += 1
                 else:
                     el.y += 3
 
         # обработка столкновений
-        if player_rect.collidelist(Platform_rect_list) > -1:
+        if player_rect.collidelist(Platform_rect_list) > -1 and player_y >= 20:
             if not is_jump:
+                sound_jump.play()
                 is_jump = True
                 jump_height = 10
 
         if bg_y == 596:
             bg_y = 0
         else:
-            bg_y += 1
+            bg_y += 2
 
         # Для столкновений
         Platform_rect = Platform.get_rect(topleft=(Platform_x, Platform_y))
         Platform1_rect = Platform1.get_rect(topleft=(Platform1_x, Platform1_y))
+        Platform2_rect = Platform2.get_rect(topleft=(Platform2_x, Platform2_y))
 
-        Platform_y += 1
-        Platform1_y += 1
+        Platform_y += 3
+        Platform1_y += 3
+        Platform2_y += 3
 
         # Соприкосновение с платформой
-        if Platform_rect.colliderect(player_rect) or Platform1_rect.colliderect(player_rect):
+        if Platform_rect.colliderect(player_rect) or Platform1_rect.colliderect(player_rect) or Platform2_rect.colliderect(player_rect):
             # print("Прыжок")
             if not is_jump:
                 is_jump = True
                 jump_height = 10
+                sound_jump.play()
 
         if is_jump:
             if jump_height > 0:
-                player_y -= (jump_height ** 2) / 1.7
+                player_y -= (jump_height ** 2) / 1.6
             if jump_height <= 0:
                 is_jump = False
             jump_height -= 1
-
+        #спуск игрока
         player_y += (player_speed ** 2) / 5
 
         # Управление игроком
         keys = pygame.key.get_pressed()
-
         if keys[pygame.K_RIGHT]:
             player_x += player_speed
             direction = True
@@ -274,10 +278,8 @@ def Gameplay():
             player_x = 297
 
         if player_y >= 596 + 15 + 83:
-            is_GameOver = True
-            print("Игра окнончена!")
+            #print("Игра окнончена!")
             Menu_GameOver() #Если игрок проиграл, то вызываестя меню проигрыша
-            break
 
         # обработка событий
         for event in pygame.event.get():
@@ -288,47 +290,85 @@ def Gameplay():
                 PlatformCnt = random.randint(2, 4)
                 Generation_platform(PlatformCnt)
 
+            if event.type == Schore_timer:
+                schore_counter += 15
+                #print("начислили 15 очков!")
+
         # отрисовка
 
         clock.tick(FPS)
-        pygame.display.flip()
-
+        pygame.display.update()
 
 #Функция для отображения проигрыша
 def Menu_GameOver():
+    is_new_record = False
+    global schore_counter
 
-    button_again = pygame.image.load("img/Button_Again.png")
+    schore = pygame.image.load("img/image_schore.png").convert()
+    schore.set_colorkey("White")
+
+
+    font_new_record = pygame.font.Font(None, 40)
+    #text_new_record = font_new_record.render("Новый рекорд!", True, (255 ,0, 0))
+    text_num_schore = font_new_record.render(f"{schore_counter}", True, (107, 107, 107))
+
+
+
+    with open("best_schore.txt", "r+") as file_best_record:
+        best_schore = int(file_best_record.readline()) #читаем из файла лучший рекорд
+
+    #print(f"Лучший рекорд: {best_schore}")
+    #print(f"Текущий счёт: {schore_counter}")
+
+    #Проверка что побит рекорд
+    if schore_counter > best_schore:
+        #print("Побит рекорд!")
+        with open("best_schore.txt", "r+") as file_best_record:
+            file_best_record.truncate(0)
+            file_best_record.write(str(schore_counter))
+            is_new_record = True
+
+    game_over_sound = pygame.mixer.Sound("Sound/game_over_sound.wav")
+    button_click = pygame.mixer.Sound("Sound/button_click.wav")
+    game_over_sound.play()
+
+    button_again = pygame.image.load("img/Button_Again.png").convert()
     button_again.set_colorkey("Red")
     button_again_rect = button_again.get_rect(topleft = (42, 350))
 
-    button_again_click = pygame.image.load("img/Button_Again_Click.png")
+    button_again_click = pygame.image.load("img/Button_Again_Click.png").convert()
     button_again_click.set_colorkey("Red")
 
-
-
-    button_menu = pygame.image.load("img/Button_Menu.png")
+    button_menu = pygame.image.load("img/Button_Menu.png").convert()
     button_menu.set_colorkey("Red")
     button_menu_rect = button_again.get_rect(topleft=(42, 420))
 
-    button_menu_click = pygame.image.load("img/Button_Menu_Click.png")
+    button_menu_click = pygame.image.load("img/Button_Menu_Click.png").convert()
     button_menu_click.set_colorkey("Red")
 
-    game_over = pygame.image.load("img/Game_Over.png")
-
+    game_over = pygame.image.load("img/Game_Over.png").convert()
+    new_record = pygame.image.load("img/new_record.png").convert()
+    new_record.set_colorkey(("White"))
     running2 = True
 
     while running2:
         screen.blit(game_over, (0, 0))
         screen.blit(button_again, (42, 350))
         screen.blit(button_menu, (42, 420))
+        screen.blit(schore, (60, 270))
+        screen.blit(text_num_schore, (175, 280))
+
+
+        if is_new_record:
+            screen.blit(new_record,(45, 180))
 
         mous_pos = pygame.mouse.get_pos()
         if button_again_rect.collidepoint(mous_pos):
-            print("Навели курсор на кнопку снова")
+            #print("Навели курсор на кнопку снова")
             screen.blit(button_again_click, (42, 350))
 
         elif button_menu_rect.collidepoint(mous_pos):
-            print("Навели курсор на кнопку меню")
+            #print("Навели курсор на кнопку меню")
             screen.blit(button_menu_click, (42, 420))
 
         #Обработка событий
@@ -339,11 +379,13 @@ def Menu_GameOver():
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if button_again_rect.collidepoint(mous_pos):
-                    print("Нажали на кнопку снова")
+                    button_click.play()
+                    #print("Нажали на кнопку снова")
                     Gameplay()
 
                 elif button_menu_rect.collidepoint(mous_pos):
-                    print("Нажали на кнопку меню")
+                    button_click.play()
+                    #print("Нажали на кнопку меню")
                     main_menu()
 
         clock.tick(FPS)
@@ -351,7 +393,3 @@ def Menu_GameOver():
 
 main_menu()
 pygame.quit()
-
-
-
-
