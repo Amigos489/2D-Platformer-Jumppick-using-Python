@@ -7,8 +7,9 @@ The game is written on version **Python 3.12.7** and **Pygame 2.6.1** under **Wi
 To change your best result, you need to change the value in the **best_record.txt** file. To view the original code, open the **main.py** file.
 
 
-<img width="295" height="624" alt="Jumppick_main_menu" src="https://github.com/user-attachments/assets/73f99f9f-4385-4531-926e-47df29a4d7c3" />
-<img width="297" height="625" alt="Jumppick_gameplay" src="https://github.com/user-attachments/assets/43d6830f-9cc7-49e7-badb-4dc89b06c8cc" />
-<img width="293" height="623" alt="Jumppick_game_over_new_record" src="https://github.com/user-attachments/assets/869e4657-1c94-4c9c-80f1-a0017917024a" />
+<img width="25%" height="25%" alt="Jumppick_main_menu" src="https://github.com/user-attachments/assets/73f99f9f-4385-4531-926e-47df29a4d7c3" />
+<img width="25%" height="25%" alt="Jumppick_gameplay" src="https://github.com/user-attachments/assets/43d6830f-9cc7-49e7-badb-4dc89b06c8cc" />
+<img width="25%" height="25%" alt="Jumppick_game_over" src="https://github.com/user-attachments/assets/5fafab3b-098e-4e17-9f57-0c3f44bac12c" />
+<img width="25%" height="25%" alt="Jumppick_game_over_new_record" src="https://github.com/user-attachments/assets/869e4657-1c94-4c9c-80f1-a0017917024a" />
 
 
